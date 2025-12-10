@@ -1,0 +1,62 @@
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# Local configuration
+local.properties
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Android specific
+/captures/
+.externalNativeBuild/
+.cxx/
+navigation.json
+
+# Signing
+signing.properties
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Log files
+*.log
+
+# APK, AAB and other build artifacts
+*.apk
+*.ap_
+*.aab
+
+# Generated files
+gen/
+out/
+
+# Kotlin/Java class files
+*.class
+*.dex
+
+# Cache
+/.gradle/5.6.4/caches/
+
+# Device screenshots
+captures/
+
+# Lint
+lint/intermediates/
+lint/generated/
+lint/partials/
+lint/tmp/
+lintReports/
+
+# Google services (descomenta si NO quieres subirlo)
+/* google-services.json
