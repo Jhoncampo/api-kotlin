@@ -8,12 +8,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.jhon.wineapp.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +32,14 @@ class MainActivity : AppCompatActivity() {
         setupAdapter()
         setupRecyclerView()
         setupRetrofit()
+        setupSwipeRefresh()
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.srlWines.setOnRefreshListener {
+            adapter.submitList(listOf())
+            getWines()
+        }
     }
 
     private fun setupAdapter() {
@@ -46,19 +56,28 @@ class MainActivity : AppCompatActivity() {
     private fun getWines() {
         lifecycleScope.launch(Dispatchers.IO) {
             //val wines = getLocalWines()
-            val wines = service.getRedWines()
-            withContext(Dispatchers.Main){
-                adapter.submitList(wines)
-            }
+           try {
+               val serverOK = Random.nextBoolean()
+               val wines = if (serverOK) service.getRedWines() else listOf()
+               withContext(Dispatchers.Main) {
+                   if (wines.isNotEmpty()) {
+                       adapter.submitList(wines)
+                   } else {
+                       Snackbar.make(binding.root, ":(", Snackbar.LENGTH_SHORT).show()
+                   }
+
+               }
+
+           } finally {
+               binding.srlWines.isRefreshing = false
+           }
         }
     }
 
 
-    private fun setupRetrofit ( ){
-        var retrofit = Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    private fun setupRetrofit() {
+        var retrofit = Retrofit.Builder().baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create()).build()
         service = retrofit.create(WineService::class.java)
     }
 
