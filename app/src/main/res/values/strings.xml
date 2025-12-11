@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Wine App</string>
+    <string name="common_resquest_fail">Error_al_cargar</string>
+
+    <string name="dialog_add_fav_title">¿Añadir a favoritos?</string>
+    <string name="dialog_add_fav_option_add">Añadir</string>
+
+    <string name="room_save_fail">Error al guarda cambios</string>
+    <string name="room_save_success">Cambios guardados</string>
 </resources>

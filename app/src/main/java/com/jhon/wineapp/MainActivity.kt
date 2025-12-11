@@ -1,6 +1,7 @@
 package com.jhon.wineapp
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -8,16 +9,18 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.jhon.wineapp.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.random.Random
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnclickListener {
 
     private lateinit var adapter: WineListAdapter
     private lateinit var binding: ActivityMainBinding
@@ -44,6 +47,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupAdapter() {
         adapter = WineListAdapter()
+        adapter.setOnClickListener(this)
     }
 
     private fun setupRecyclerView() {
@@ -56,22 +60,43 @@ class MainActivity : AppCompatActivity() {
     private fun getWines() {
         lifecycleScope.launch(Dispatchers.IO) {
             //val wines = getLocalWines()
-           try {
-               val serverOK = Random.nextBoolean()
-               val wines = if (serverOK) service.getRedWines() else listOf()
-               withContext(Dispatchers.Main) {
-                   if (wines.isNotEmpty()) {
-                       adapter.submitList(wines)
-                   } else {
-                       Snackbar.make(binding.root, ":(", Snackbar.LENGTH_SHORT).show()
-                   }
+            try {
+                val serverOK = Random.nextBoolean()
+                val wines = if (serverOK) service.getRedWines() else listOf()
+                withContext(Dispatchers.Main) {
+                    if (wines.isNotEmpty()) {
+                        showRecyclerView(true)
+                        showNoDataView(false)
+                        adapter.submitList(wines)
+                    } else {
+                        showRecyclerView(false)
+                        showNoDataView(true)
+                    }
 
-               }
+                }
 
-           } finally {
-               binding.srlWines.isRefreshing = false
-           }
+            } catch (e: Exception) {
+                showMsg((R.string.common_resquest_fail))
+            } finally {
+                showProgress(false)
+            }
         }
+    }
+
+    private fun showMsg(msgRes: Int) {
+        Snackbar.make(binding.root, msgRes, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun showRecyclerView(isVisible: Boolean) {
+        binding.recycleView.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
+
+    private fun showNoDataView(isVisible: Boolean) {
+        binding.tvNoData.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
+
+    private fun showProgress(isVisible: Boolean) {
+        binding.srlWines.isRefreshing = isVisible
     }
 
 
@@ -81,47 +106,37 @@ class MainActivity : AppCompatActivity() {
         service = retrofit.create(WineService::class.java)
     }
 
-    private fun getLocalWines() = listOf(
-        Wine(
-            "Don Mario 12",
-            "Carlos Pérez",
-            Rating("4.7", "389 ratings"),
-            "Argentina",
-            "https://picsum.photos/200",
-            2
-        ),
-
-        Wine(
-            "La Montaña Roja",
-            "Lucía Herrera",
-            Rating("4.5", "512 ratings"),
-            "Chile",
-            "https://picsum.photos/200",
-            3
-        ),
-
-        Wine(
-            "Reserva del Valle",
-            "Miguel Torres",
-            Rating("4.8", "620 ratings"),
-            "España",
-            "https://picsum.photos/200",
-            4
-        ),
-
-        Wine(
-            "Monte Verde Classic",
-            "Ana Rodríguez",
-            Rating("4.6", "301 ratings"),
-            "Italia",
-            "https://picsum.photos/200",
-            5
-        )
-
-    )
 
     override fun onResume() {
         super.onResume()
+        showProgress(true)
         getWines()
+    }
+
+    /*
+    OnClickListener
+    * */
+    override fun onLongClick(wine: Wine) {
+        val options = resources.getStringArray(R.array.array_dialog_add_options)
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_add_fav_title)
+            .setItems(options) { _, index ->
+                when (index) {
+                    0 -> addToFavorites(wine)
+                }
+            }
+            .show()
+    }
+
+    private fun addToFavorites(wine: Wine) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = WineApplication.database.wineDao().addWine(wine)
+            if (result != -1L) {
+                showMsg(R.string.room_save_success)
+            } else {
+                showMsg(R.string.room_save_fail)
+            }
+        }
+
     }
 }

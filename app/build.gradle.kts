@@ -39,7 +39,7 @@ android {
     }
     viewBinding { enable = true }
 }
-
+val room_version = "2.8.4"
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -56,8 +56,14 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 
     // SwipeRefrestLayout
-
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
+
+    // Room
+    implementation("androidx.room:room-runtime:$room_version")
+
+    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+    // See Add the KSP plugin to your project
+    kapt("androidx.room:room-compiler:$room_version")
 
 
     testImplementation(libs.junit)

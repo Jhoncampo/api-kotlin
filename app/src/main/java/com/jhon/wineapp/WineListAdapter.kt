@@ -12,7 +12,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.jhon.wineapp.databinding.ItemWineBinding
 
 class WineListAdapter : ListAdapter<Wine, RecyclerView.ViewHolder>(WineDiff()) {
-    private  lateinit var context: Context
+    private lateinit var context: Context
+    private lateinit var listener: OnclickListener
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -29,8 +30,9 @@ class WineListAdapter : ListAdapter<Wine, RecyclerView.ViewHolder>(WineDiff()) {
         position: Int
     ) {
         val wine = getItem(position)
-        (holder as ViewHolder).run{
-            with(binding){
+        (holder as ViewHolder).run {
+            setListener(wine)
+            with(binding) {
                 tvWine.text = wine.wine
                 tvWinery.text = wine.winery
                 tvLocation.text = wine.location
@@ -46,8 +48,19 @@ class WineListAdapter : ListAdapter<Wine, RecyclerView.ViewHolder>(WineDiff()) {
         }
     }
 
+    fun setOnClickListener(listener: OnclickListener) {
+        this.listener = listener
+
+    }
+
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val binding = ItemWineBinding.bind(view)
+        fun setListener(wine: Wine) {
+            binding.root.setOnLongClickListener {
+                listener.onLongClick(wine)
+                true
+            }
+        }
     }
 
     private class WineDiff : DiffUtil.ItemCallback<Wine>() {
