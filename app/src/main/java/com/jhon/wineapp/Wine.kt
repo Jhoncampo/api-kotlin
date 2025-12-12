@@ -12,5 +12,6 @@ data class Wine(
     val location: String,
     val image: String,
     @PrimaryKey val id: Int,
+    var isFavourite: Boolean = false
 )
 

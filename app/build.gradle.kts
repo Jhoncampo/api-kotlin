@@ -40,6 +40,7 @@ android {
     viewBinding { enable = true }
 }
 val room_version = "2.8.4"
+val nav_version = "2.9.6"
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -64,6 +65,10 @@ dependencies {
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See Add the KSP plugin to your project
     kapt("androidx.room:room-compiler:$room_version")
+
+    // Views/Fragments integration Navigation
+    implementation("androidx.navigation:navigation-fragment:${nav_version}")
+    implementation("androidx.navigation:navigation-ui:${nav_version}")
 
 
     testImplementation(libs.junit)

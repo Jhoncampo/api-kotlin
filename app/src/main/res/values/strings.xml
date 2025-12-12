@@ -7,4 +7,6 @@
 
     <string name="room_save_fail">Error al guarda cambios</string>
     <string name="room_save_success">Cambios guardados</string>
+    <string name="home_title">Home</string>
+    <string name="favourites_title">Favourites</string>
 </resources>

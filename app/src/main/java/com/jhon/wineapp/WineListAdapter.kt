@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.jhon.wineapp.databinding.ItemWineBinding
 
-class WineListAdapter : ListAdapter<Wine, RecyclerView.ViewHolder>(WineDiff()) {
+open class WineListAdapter : ListAdapter<Wine, RecyclerView.ViewHolder>(WineDiff()) {
     private lateinit var context: Context
     private lateinit var listener: OnclickListener
 
@@ -59,6 +59,10 @@ class WineListAdapter : ListAdapter<Wine, RecyclerView.ViewHolder>(WineDiff()) {
             binding.root.setOnLongClickListener {
                 listener.onLongClick(wine)
                 true
+            }
+
+            binding.root.setOnClickListener {
+                listener.onFavourite(wine)
             }
         }
     }
