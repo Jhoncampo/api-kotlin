@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FavouriteFragment: BaseFragment(), OnclickListener {
+class FavouriteFragment : BaseFragment(), OnclickListener {
     private lateinit var adapter: WineFavListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -18,7 +18,6 @@ class FavouriteFragment: BaseFragment(), OnclickListener {
         setupRecyclerView()
         setupSwipeRefresh()
     }
-
 
 
     private fun setupAdapter() {
@@ -32,17 +31,19 @@ class FavouriteFragment: BaseFragment(), OnclickListener {
             adapter = this@FavouriteFragment.adapter
         }
     }
+
     private fun setupSwipeRefresh() {
         binding.srlWines.setOnRefreshListener {
             adapter.submitList(listOf())
             getWines()
         }
     }
+
     override fun getWines() {
         lifecycleScope.launch(Dispatchers.IO) {
             //val wines = getLocalWines()
             try {
-                val wines = WineApplication.database.wineDao().getAllWines()
+                val wines = WineApplication.database.wineDao().getWinesFav(true)
                 withContext(Dispatchers.Main) {
                     if (wines.isNotEmpty()) {
                         showRecyclerView(true)
@@ -62,25 +63,36 @@ class FavouriteFragment: BaseFragment(), OnclickListener {
             }
         }
     }
+
     override fun onResume() {
         super.onResume()
         showProgress(true)
         getWines()
     }
+
     /*
     OnClickListener
     * */
     override fun onLongClick(wine: Wine) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = WineApplication.database.wineDao().deleteWine(wine)
+            if (result == 0) {
+                showMsg(R.string.room_save_fail)
+            } else {
+                showMsg(R.string.room_delete_success)
+            }
+        }
 
     }
+
     override fun onFavourite(wine: Wine) {
         wine.isFavourite = !wine.isFavourite
 
         lifecycleScope.launch(Dispatchers.IO) {
             val result = WineApplication.database.wineDao().updateWine(wine)
-            if (result == 0){
+            if (result == 0) {
                 showMsg(R.string.room_save_fail)
-            }else {
+            } else {
                 showMsg(R.string.room_update_success)
             }
         }
