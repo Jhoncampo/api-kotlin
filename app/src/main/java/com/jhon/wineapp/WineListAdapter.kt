@@ -61,7 +61,7 @@ open class WineListAdapter : ListAdapter<Wine, RecyclerView.ViewHolder>(WineDiff
                 true
             }
 
-            binding.root.setOnClickListener {
+            binding.cbFavourite.setOnClickListener {
                 listener.onFavourite(wine)
             }
         }

@@ -70,8 +70,19 @@ class FavouriteFragment: BaseFragment(), OnclickListener {
     /*
     OnClickListener
     * */
-    override fun onLongClick(wine: Wine) {}
+    override fun onLongClick(wine: Wine) {
+
+    }
     override fun onFavourite(wine: Wine) {
-        TODO("Not yet implemented")
+        wine.isFavourite = !wine.isFavourite
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = WineApplication.database.wineDao().updateWine(wine)
+            if (result == 0){
+                showMsg(R.string.room_save_fail)
+            }else {
+                showMsg(R.string.room_update_success)
+            }
+        }
     }
 }
